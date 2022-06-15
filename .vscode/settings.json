@@ -1,0 +1,12 @@
+{
+    "files.associations": {
+        "stdio.h": "c",
+        "pk_kaggle_converter.h": "c",
+        "pokemon_parser.h": "c",
+        "moves_parser.h": "c",
+        "math.h": "c",
+        "typeinfo": "c",
+        "species.h": "c",
+        "pokemon_moves_parser.h": "c"
+    }
+}
