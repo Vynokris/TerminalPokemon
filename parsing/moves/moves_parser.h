@@ -24,7 +24,7 @@ typedef struct MoveDBEntry
 } MoveDBEntry;
 
 // All the moves of generation 1.
-MoveDBEntry move_list[165];
+extern MoveDBEntry move_list[165];
 
 // Parse an int and return it.
 void parse_moves_csv_int(FILE* f, char** db_ptr);

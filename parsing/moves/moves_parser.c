@@ -1,5 +1,7 @@
 #include "moves_parser.h"
 
+MoveDBEntry move_list[165] = {};
+
 
 void parse_moves_csv_int(FILE* f, char** db_ptr)
 {
@@ -53,7 +55,7 @@ void parse_moves_csv_line(FILE* f, MoveDBEntry* move_list, int col_num)
 void parse_moves_csv(MoveDBEntry* move_list)
 {
     // Open the csv file.
-    FILE* f = fopen("../parsing/databases/moves.csv", "r");
+    FILE* f = fopen("parsing/databases/moves.csv", "r");
 
     // Skip the first line since it contains the column headers.
     goto_next_line(f);

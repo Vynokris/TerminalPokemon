@@ -7,6 +7,8 @@
         "math.h": "c",
         "typeinfo": "c",
         "species.h": "c",
-        "pokemon_moves_parser.h": "c"
+        "pokemon_moves_parser.h": "c",
+        "text_formatter.h": "c",
+        "game_functions.h": "c"
     }
 }

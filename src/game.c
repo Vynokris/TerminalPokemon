@@ -2,7 +2,6 @@
 
 #include "game_functions.h"
 
-
 int main()
 {
     srand(time(NULL));

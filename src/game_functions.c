@@ -1,6 +1,11 @@
 #include "game_functions.h"
 
 // --------------- GLOBAL VARIABLES --------------- //
+
+Species gen1Species[151] = {};
+Pokemon player_team[6]   = {};
+Item    inventory[9]     = {};
+
 // Type table ordered like the Types enum (Null (Unused), Normal, Fighting, Flying, Poison, Ground, Rock, Bug, Ghost, Steel (Unused), Fire, Water, Grass, Electric, Psychic, Ice, Dragon).
 float typeTable[17][17] = 
 {
@@ -29,17 +34,31 @@ float typeTable[17][17] =
 void get_gen1Species()
 {
     // Read the pokemon species from gen 1 from the gen1Species.bin file.
-    FILE* f = fopen("../parsing/bin/gen1Species.bin", "rb");
-    fread(&gen1Species, sizeof(gen1Species[0]), 151, f);
-    fclose(f);
+    FILE* f = fopen("parsing/bin/gen1Species.bin", "rb");
+    if (f)
+    {
+        fread(&gen1Species, sizeof(gen1Species[0]), 151, f);
+        fclose(f);
+    }
+    else
+    {
+        getGen1Species(gen1Species);
+    }
 }
 
 void get_move_list()
 {
     // Read the pokemon moves from gen 1 from the move_list.bin file.
-    FILE* f = fopen("../parsing/bin/move_list.bin", "rb");
-    fread(&move_list, sizeof(move_list[0]), 165, f);
-    fclose(f);
+    FILE* f = fopen("parsing/bin/move_list.bin", "rb");
+    if (f)
+    {
+        fread(&move_list, sizeof(move_list[0]), 165, f);
+        fclose(f);
+    }
+    else
+    {
+        fill_move_list(move_list);
+    }
 }
 
 Species get_species_by_id(int id)
@@ -659,111 +678,17 @@ void init_pk_instance(Pokemon* pk_instance, Species* species, int level)
 void get_player_team()
 {
     // Read the player's team from team.bin.
-    FILE* f = fopen("../player_data/team.bin", "rb");
+    FILE* f = fopen("player_data/team.bin", "rb");
     fread(&player_team, sizeof(player_team[0]), 6, f);
     fclose(f);
-    
-    // Old way to do it with a csv file.
-    /*
-    FILE* f = fopen("../player_data/team.csv", "r");
-
-    goto_next_line(f);
-
-    // Read each of the pokemons in the player's team.
-    int i = 0;
-    while (!feof(f)) 
-    {
-        // Get and set each of the current pokemon's saved stats.
-        int saved_stat;
-        int* stat_ptr = &player_team[i];
-        for (int j = 0; j < 16; j++)
-        {
-            fscanf(f, "%d", &saved_stat);
-            fgetc(f);
-            *stat_ptr = saved_stat;
-            stat_ptr++;
-        }
-
-        // Get and set each of the current pokemon's moves.
-        for (int j = 0; j < 4; j++) {
-            int current_move_id;
-            fscanf(f, "%d", &current_move_id);
-            fgetc(f);
-            player_team[i].moves[j].id = current_move_id;
-            if (current_move_id != 0) {
-                player_team[i].moves[j].current_pp = get_move_by_id(current_move_id).pp;
-            }
-            else {
-                player_team[i].moves[j].current_pp = 0;
-            }
-        }
-
-        // Increment the iterator.
-        i++;
-    }
-
-    // Set the first empty pokemon slot to id 0.
-    while (i < 6) {
-        player_team[i].id = 0;
-        i++;
-    }
-
-    fclose(f);
-    */
 }
 
 void save_player_team()
 {
     // Save the player's team in a binary file.
-    FILE* f = fopen("../player_data/team.bin", "wb");
+    FILE* f = fopen("player_data/team.bin", "wb");
     fwrite(&player_team, sizeof(player_team[0]), 6, f);
     fclose(f);
-
-    // Old way to do it with a csv file.
-    /*
-    // Get the first line of the team.csv file (the one that contains all the headers).
-    f = fopen("../player_data/team.csv", "r");
-    char* first_team_csv_line = calloc(256, sizeof(char));
-    fgets(first_team_csv_line, 256, f);
-
-    // Wipe the team.csv and add the header line.
-    f = fopen("../player_data/team.csv", "w");
-    fprintf(f, "%s", first_team_csv_line);
-    free(first_team_csv_line);
-
-    // Save each of the player's pokemons.
-    for (int i = 0; i < 6 && player_team[i].id != 0; i++) 
-    {
-        // Save the pokemon's stats.
-        int* stat_ptr = &player_team[i].id;
-        for (int j = 0; j < 15; j++) {
-            // Save the current stat.
-            fprintf(f, "%d, ", *stat_ptr);
-
-            // Move to the next stat.
-            stat_ptr++;
-        }
-
-        // Save the pokemon's shininess.
-        fprintf(f, "%d, ", player_team[i].shiny);
-
-        // Save the pokemon's moves.
-        for (int j = 0; j < 4; j++) {
-            // Save the current move id.
-            if (j == 3) {
-                if (i + 1 >= 6 || player_team[i+1].id == 0) {
-                    fprintf(f, "%d", player_team[i].moves[j].id);
-                }
-                else {
-                    fprintf(f, "%d\n", player_team[i].moves[j].id);
-                }
-            }
-            else {
-                fprintf(f, "%d, ", player_team[i].moves[j].id);
-            }
-        }
-    }
-    */
 }
 
 void player_team_options()
@@ -901,69 +826,18 @@ void player_team_options()
 
 void get_player_inventory()
 {
-    // /*
     // Get the player's inventory from the binary file inventory.bin.
-    FILE* f = fopen("../player_data/inventory.bin", "rb");
+    FILE* f = fopen("player_data/inventory.bin", "rb");
     fread(&inventory, sizeof(inventory[0]), 9, f);
     fclose(f);
-    // */
-    
-    // Old way to do it with a csv file.
-    /*
-    FILE* f = fopen("../player_data/inventory.csv", "r");
-
-    // Set the item names.
-    for (int i = 0; i < 8; i++) {
-        char current_item_name[16];
-        fscanf(f, "%[^,\n]", current_item_name);
-        fgetc(f);
-        if (i < 7) {
-            fgetc(f);
-        }
-        for (int j = 0; current_item_name[j] != '\0'; j++) {
-            inventory[i].name[j] = current_item_name[j];
-        }
-    }
-
-    // Set the item counts.
-    for (int i = 0; i < 8; i++) {
-        int current_item_count = 0;
-        fscanf(f, "%d", &current_item_count);
-        fgetc(f);
-        inventory[i].count = current_item_count;
-    }
-    */
 }
 
 void save_player_inventory()
 {
     // Save the player's inventory in a binary file.
-    FILE* f = fopen("../player_data/inventory.bin", "wb");
+    FILE* f = fopen("player_data/inventory.bin", "wb");
     fwrite(&inventory, sizeof(inventory[0]), 9, f);
     fclose(f);
-
-    // Old way to do it with a csv file.
-    /*
-    // Get the first line of the inventory.csv file (the one that contains all the headers).
-    f = fopen("../player_data/inventory.csv", "r");
-    char* first_inventory_csv_line = calloc(128, sizeof(char));
-    fgets(first_inventory_csv_line, 256, f);
-
-    // Wipe the inventory.csv and add the header line.
-    f = fopen("../player_data/inventory.csv", "w");
-    fprintf(f, "%s", first_inventory_csv_line);
-    free(first_inventory_csv_line);
-
-    // Save all the item counts.
-    for (int i = 0; i < 8; i++) {
-        if (i == 7) {
-            fprintf(f, "%d", inventory[i].count);
-        }
-        else {
-            fprintf(f, "%d, ", inventory[i].count);
-        }
-    }
-    */
 }
 
 
@@ -973,7 +847,7 @@ void before_battle_actions()
 {
 
     // Check if the player can go to a pokecenter.
-    FILE* f = fopen("../player_data/last_city.csv", "r");
+    FILE* f = fopen("player_data/last_city.csv", "r");
     int last_city;
     fscanf(f, "%d", &last_city);
     fclose(f);
@@ -981,7 +855,11 @@ void before_battle_actions()
     while (true)
     {
         // Clear the console.
+        #ifdef _WIN32
+        system("cls");
+        #else
         system("clear");
+        #endif
 
         // Show the player's options.
         printf("1: BATTLE\n2: ITEMS\n");
@@ -1012,7 +890,7 @@ void before_battle_actions()
                     shop_menu();
 
                     // Reset the last_city value.
-                    f = fopen("../player_data/last_city.csv", "w");
+                    f = fopen("player_data/last_city.csv", "w");
                     fprintf(f, "%d", 0);
                     fclose(f);
                 }
@@ -1024,7 +902,7 @@ void before_battle_actions()
                     pokecenter();
 
                     // Reset the last_city value.
-                    f = fopen("../player_data/last_city.csv", "w");
+                    f = fopen("player_data/last_city.csv", "w");
                     fprintf(f, "%d", 0);
                     fclose(f);
                 }
@@ -1032,10 +910,10 @@ void before_battle_actions()
 
         if (player_choice == 1) {
             // Increment the last_city value.
-            f = fopen("../player_data/last_city.csv", "r");
+            f = fopen("player_data/last_city.csv", "r");
             fscanf(f, "%d", &last_city);
             fclose(f);
-            f = fopen("../player_data/last_city.csv", "w");
+            f = fopen("player_data/last_city.csv", "w");
             fprintf(f, "%d", last_city+1);
             fclose(f);
             break;
@@ -1091,7 +969,11 @@ void shop_menu()
     while (true)
     {
         // Clear the console.
+        #ifdef _WIN32
+        system("cls");
+        #else
         system("clear");
+        #endif
 
         // Show all of the player's options.
         printf("Items in shop:\n");
@@ -1101,16 +983,16 @@ void shop_menu()
         printf("9: BACK\n");
 
         // Let the player choose which item to use.
-        printf("Your budget: ₽%d\n%sBuy which item? ", inventory[9].count, C_GRAY);
+        printf("Your budget: ₽%d\n%sBuy which item? ", inventory[8].count, C_GRAY);
         int item_choice;
         scanf("%d", &item_choice);
         getchar();
         printf("%s\n", C_DEFAULT);
 
         if (item_choice >= 1 && item_choice <= 8) {
-            if (inventory[item_choice-1].price <= inventory[9].count) {
+            if (inventory[item_choice-1].price <= inventory[8].count) {
                 inventory[item_choice-1].count++;
-                inventory[9].count -= inventory[item_choice-1].price;
+                inventory[8].count -= inventory[item_choice-1].price;
                 printf("You bought a %s!\n", inventory[item_choice-1].name);
 
                 // Wait for the player to continue.
@@ -1199,7 +1081,11 @@ int item_menu(bool can_use_balls)
 {
     while (true) {
         // Clear the console.
+        #ifdef _WIN32
+        system("cls");
+        #else
         system("clear");
+        #endif
 
         // Show all of the player's options.
         printf("Items in bag:\n");
@@ -1561,7 +1447,11 @@ int play_wild_battle_turn(Pokemon* player_team, char* player_choice, Pokemon* wi
 int start_wild_battle(Pokemon* player_team, Pokemon* wild_pk, bool* used_pk)
 {
     // Clear the console.
+    #ifdef _WIN32
+    system("cls");
+    #else
     system("clear");
+    #endif
 
     // Battle start text.
     if (wild_pk->shiny) {
@@ -1584,7 +1474,11 @@ int start_wild_battle(Pokemon* player_team, Pokemon* wild_pk, bool* used_pk)
         // ----- SHOW THE GAME STATE ----- //
 
         // Clear the console.
+        #ifdef _WIN32
+        system("cls");
+        #else
         system("clear");
+        #endif
         
         // Show the wild pokemon's name, level and hp.
         if (wild_pk->shiny) {
@@ -1652,7 +1546,11 @@ int start_wild_battle(Pokemon* player_team, Pokemon* wild_pk, bool* used_pk)
         // ----- PLAY THE TURN ----- //
 
         // Clear the console.
+        #ifdef _WIN32
+        system("cls");
+        #else
         system("clear");
+        #endif
 
         // Play the turn according to what each chose to do.
         int turn_outcome = play_wild_battle_turn(player_team, player_choice, wild_pk, wild_pk_choice, &escape_attempts, used_pk);
@@ -1728,7 +1626,11 @@ void end_wild_battle(Pokemon* player_team, Pokemon* wild_pk, int outcome, bool* 
         // If the player defeated the wild pokemon.
         case 2:
             // Clear the console.
+            #ifdef _WIN32
+            system("cls");
+            #else
             system("clear");
+            #endif
 
             // Tell the player the wild pokemon fainted.
             printf("Enemy %s fainted!\n", get_species_by_id(wild_pk->id).name);

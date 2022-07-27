@@ -109,7 +109,7 @@ void parse_pk_csv_line(FILE* f, PokemonDBEntry* pokedex_entry, int col_num, char
 void parse_pk_csv(PokemonDBEntry* pokedex)
 {
     // Open the csv file.
-    FILE* f = fopen("../parsing/databases/pokemons.csv", "r");
+    FILE* f = fopen("parsing/databases/pokemons.csv", "r");
 
     // Format of all the columns.
     char* format = "ddsssdsffssssssssssffdssdddddddddddddddsddssdds";

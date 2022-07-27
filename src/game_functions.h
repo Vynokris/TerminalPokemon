@@ -9,7 +9,7 @@
 #include "../parsing/moves/moves_parser.h"
 
 // All the pokemon species of generation 1.
-Species gen1Species[151];
+extern Species gen1Species[151];
 
 
 // Structure for a move instance (id, pp, pp max).
@@ -40,7 +40,7 @@ typedef struct Pokemon {
 } Pokemon;
 
 // The player's team.
-Pokemon player_team[6];
+extern Pokemon player_team[6];
 
 // Structure for an item entry in the player's inventory.
 typedef struct Item {
@@ -50,7 +50,7 @@ typedef struct Item {
 } Item;
 
 // The player's inventory.
-Item inventory[9];
+extern Item inventory[9];
 
 
 // --------------- UTILITY FUNCTIONS --------------- //

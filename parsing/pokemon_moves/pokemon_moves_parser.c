@@ -5,7 +5,7 @@
 void parse_pk_moves_pk_moves_csv(LearnableMove* learnable_moves, int pk_id)
 {
     // Open the csv file.
-    FILE* f = fopen("../parsing/databases/pokemon_moves.csv", "r");
+    FILE* f = fopen("parsing/databases/pokemon_moves.csv", "r");
 
     // Skip the first line since it contains the column headers.
     goto_next_line(f);
